@@ -1,0 +1,10 @@
+<h1>タスクの新規作成フォーム</h1>
+
+<%= form_with(model: @task, local: true) do |f| %>
+  <%=f.label :contents ,"新しいタスク" %>
+  <%= f.text_field  :contents %>
+  
+  <%= f.submit "追加" %>
+<% end %>
+
+<%= link_to  "一覧に戻る",root_path %>
