@@ -1,6 +1,11 @@
 class TasksController < ApplicationController
+  before_action :require_login #ログインユーザーのみに許可
+  before_action :current_user  #現在ログインしているユーザー
+  before_action :not_permission_without_post_user, only: [:show,:edit,:update,:destroy]      # タスク投稿者以外禁止
+  
+  
   def index
-    @tasks = Task.all
+    @tasks = @current_user.tasks.all
   end
   
   def show
@@ -34,7 +39,7 @@ class TasksController < ApplicationController
   end 
   
   def create 
-    @task = Task.new(task_params)
+    @task =  @current_user.tasks.build(task_params)
     
     if @task.save 
        flash[:success] = "タスクを追加しました。"
@@ -49,8 +54,16 @@ class TasksController < ApplicationController
   private 
     
     def task_params
-      params.require(:task).permit(:content,:status)
+      params.require(:task).permit(:content,:status,:user)
     end 
     
-  
+    # タスク投稿者以外禁止
+   def  not_permission_without_post_user
+     task = Task.find(params[:id])
+     if @current_user.id != task.user_id 
+       flash[:danger] = "許可がありません"
+       redirect_to root_url
+     end
+   end
+
 end
